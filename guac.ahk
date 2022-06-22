@@ -13,7 +13,7 @@ LV_Colors.OnMessage()
 user := A_UserName
 IfInString, A_WorkingDir, AhkProjects
 {
-	netdir := A_WorkingDir "\files\Tuesday_Conference"								; local files
+	netdir := A_WorkingDir "\devfiles\Tuesday_Conference"							; local files
 	chipdir := ""
 	isDevt := true
 } else {
@@ -53,7 +53,7 @@ MainGUI:
 {
 	if !IsObject(dt) {
 		if (isDevt) {
-			dt := GetConfDate("20160329")											; use test dir. change this if want "live" handling
+			dt := GetConfDate("20220614")											; use test dir. change this if want "live" handling
 		} else {
 			dt := GetConfDate()														; determine next conference date into array dt
 		}
