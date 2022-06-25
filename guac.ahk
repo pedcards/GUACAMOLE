@@ -10,32 +10,37 @@ SetWorkingDir %A_ScriptDir% ; Ensures a consistent starting directory.
 WinClose, View Downloads - Windows Internet Explorer
 LV_Colors.OnMessage()
 
-user := A_UserName
-IfInString, A_WorkingDir, AhkProjects
+Initialization:
 {
-	netdir := A_WorkingDir "\devfiles\Tuesday_Conference"							; local files
-	chipdir := ""
-	isDevt := true
-} else {
-	netdir := "\\childrens\files\HCConference\Tuesday_Conference"					; networked Conference folder
-	chipdir := "\\childrens\files\HCChipotle\"										; and CHIPOTLE files
-	isDevt := false
+	/*	Set environment and vars
+	*/
+	user := A_UserName
+	IfInString, A_WorkingDir, AhkProjects
+	{
+		netdir := A_WorkingDir "\devfiles\Tuesday_Conference"						; local files
+		chipdir := A_WorkingDir "\devfiles\chipotle\"
+		isDevt := true
+	} else {
+		netdir := "\\childrens\files\HCConference\Tuesday_Conference"				; networked Conference folder
+		chipdir := "\\childrens\files\HCChipotle\"									; and CHIPOTLE files
+		isDevt := false
+	}
+	MsgBox, 36, GUACAMOLE, Are you launching GUACAMOLE for patient presentation?
+	IfMsgBox Yes
+		Presenter := true
+	else
+		Presenter := false
+
+	firstRun := true
+	SplashImage, % chipDir "guac.jpg", B2 
+
+	y := new XML(chipdir "currlist.xml")											; Get latest local currlist into memory
+	arch := new XML(chipdir "archlist.xml")											; Get archive.xml
+	datedir := Object()
+	mo := ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
+	ConfStart := A_Now
+	;~ ConfStart := "20160416132100"
 }
-MsgBox, 36, GUACAMOLE, Are you launching GUACAMOLE for patient presentation?
-IfMsgBox Yes
-	Presenter := true
-else
-	Presenter := false
-
-firstRun := true
-SplashImage, % chipDir "guac.jpg", B2 
-
-y := new XML(chipdir "currlist.xml")												; Get latest local currlist into memory
-arch := new XML(chipdir "archlist.xml")												; Get archive.xml
-datedir := Object()
-mo := ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
-ConfStart := A_Now
-;~ ConfStart := "20160416132100"
 
 Gosub MainGUI																		; Draw the main GUI
 if (firstRun) {
