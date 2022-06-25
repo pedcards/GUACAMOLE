@@ -17,13 +17,15 @@ Initialization:
 	user := A_UserName
 	IfInString, A_WorkingDir, AhkProjects
 	{
-		netdir := A_WorkingDir "\devfiles\Tuesday_Conference"						; local files
-		chipdir := A_WorkingDir "\devfiles\chipotle\"
 		isDevt := true
+		netdir := A_WorkingDir "\devfiles\Tuesday_Conference"						; local files
+		chipdir := A_WorkingDir "\devfiles\CHIPOTLE\"
+		ConfStart := "20220614140000"
 	} else {
+		isDevt := false
 		netdir := "\\childrens\files\HCConference\Tuesday_Conference"				; networked Conference folder
 		chipdir := "\\childrens\files\HCChipotle\"									; and CHIPOTLE files
-		isDevt := false
+		ConfStart := A_Now
 	}
 	MsgBox, 36, GUACAMOLE, Are you launching GUACAMOLE for patient presentation?
 	IfMsgBox Yes
@@ -38,8 +40,6 @@ Initialization:
 	arch := new XML(chipdir "archlist.xml")											; Get archive.xml
 	datedir := Object()
 	mo := ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
-	ConfStart := A_Now
-	;~ ConfStart := "20160416132100"
 }
 
 Gosub MainGUI																		; Draw the main GUI
