@@ -119,10 +119,13 @@ confTimer() {
 
 elapsed(start,end) {
 	start -= end, Seconds															; Seconds betwen Start and End vars
-	HH := floor(-start/3600)														; Derive HH from Start elapsed secs 
-	MM := floor((-start-HH*3600)/60)												; Derive MM from remainder of HH
-	SS := HH*3600-MM*60-start														; Derive SS from remainder of MM
-	Return {"hh":zDigit(HH), "mm":zDigit(MM), "ss":zDigit(SS)}
+	HH := zDigit(floor(-start/3600))												; Derive HH from Start elapsed secs 
+	MM := zDigit(floor((-start-HH*3600)/60))										; Derive MM from remainder of HH
+	SS := zDigit(HH*3600-MM*60-start)												; Derive SS from remainder of MM
+	Return {"hh":zDigit(HH), "mm":zDigit(MM), "ss":zDigit(SS)
+		, HHMM:HH ":" MM
+		, HHMMSS:HH ":" MM ":" SS
+		, MMSS:MM ":" SS}
 }
 
 formatSec(time) {
@@ -498,7 +501,7 @@ PatConsole:
 PatCxTimer:
 {
 	tt := elapsed(PatTime,A_Now)														; get elapsed time between PatTime and A_Now
-	GuiControl, PatCx:Text, PatCxT, % tt.mm ":" tt.ss									; update PatCx time display
+	GuiControl, PatCx:Text, PatCxT, % tt.MMSS											; update PatCx time display
 	
 	if (tt.mm >= 15) {																	; bkgd alternates RED/YEL every cycle (0.5 sec)
 		PatCxColor := !(PatCxColor)
