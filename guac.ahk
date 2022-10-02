@@ -10,32 +10,40 @@ SetWorkingDir %A_ScriptDir% ; Ensures a consistent starting directory.
 WinClose, View Downloads - Windows Internet Explorer
 LV_Colors.OnMessage()
 
-user := A_UserName
-IfInString, A_WorkingDir, AhkProjects
+Initialization:
 {
-	netdir := A_WorkingDir "\devfiles\Tuesday_Conference"							; local files
-	chipdir := ""
-	isDevt := true
-} else {
-	netdir := "\\childrens\files\HCConference\Tuesday_Conference"					; networked Conference folder
-	chipdir := "\\childrens\files\HCChipotle\"										; and CHIPOTLE files
-	isDevt := false
+	/*	Set environment and vars
+	*/
+	global user, isDevt, netdir, chipdir, confDT, isPresenter
+		, y, arch, dateDir, confTime
+
+	user := A_UserName
+	IfInString, A_WorkingDir, AhkProjects
+	{
+		isDevt := true
+		netdir := A_WorkingDir "\devfiles\Tuesday_Conference"						; local files
+		chipdir := A_WorkingDir "\devfiles\CHIPOTLE\"
+		confDT := "20220614140000"
+	} else {
+		isDevt := false
+		netdir := "\\childrens\files\HCConference\Tuesday_Conference"				; networked Conference folder
+		chipdir := "\\childrens\files\HCChipotle\"									; and CHIPOTLE files
+		confDT := A_Now
+	}
+	MsgBox, 36, GUACAMOLE, Are you launching GUACAMOLE for patient presentation?
+	IfMsgBox Yes
+		isPresenter := true
+	else
+		isPresenter := false
+
+	firstRun := true
+	SplashImage, % chipDir "guac.jpg", B2 
+
+	y := new XML(chipdir "currlist.xml")											; Get latest local currlist into memory
+	arch := new XML(chipdir "archlist.xml")											; Get archive.xml
+	datedir := Object()
+	mo := ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
 }
-MsgBox, 36, GUACAMOLE, Are you launching GUACAMOLE for patient presentation?
-IfMsgBox Yes
-	Presenter := true
-else
-	Presenter := false
-
-firstRun := true
-SplashImage, % chipDir "guac.jpg", B2 
-
-y := new XML(chipdir "currlist.xml")												; Get latest local currlist into memory
-arch := new XML(chipdir "archlist.xml")												; Get archive.xml
-datedir := Object()
-mo := ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
-ConfStart := A_Now
-;~ ConfStart := "20160416132100"
 
 Gosub MainGUI																		; Draw the main GUI
 if (firstRun) {
@@ -43,7 +51,7 @@ if (firstRun) {
 	SplashImage, off
 	firstRun := false
 }
-SetTimer, ConfTime, 1000															; Update ConfTime every 1000 ms
+SetTimer, confTime, 1000															; Update ConfTime every 1000 ms
 WinWaitClose, GUACAMOLE Main														; wait until main GUI is closed
 ExitApp
 
@@ -99,8 +107,8 @@ ConfTime:
 	FormatTime, tmp, , HH:mm:ss														; Format the current time
 	GuiControl, main:Text, CTime, % tmp												; Update the main GUI current time
 	
-	if (Presenter) {																; For presenter only,
-		tt := elapsed(ConfStart,A_Now)												; Total time elapsed
+	if (isPresenter) {																; For presenter only,
+		tt := elapsed(confDT,A_Now)													; Total time elapsed
 		GuiControl, main:Text, CDur, % tt.hh ":" tt.mm ":" tt.ss					; Update the main GUI elapsed time
 	}
 return
@@ -168,10 +176,10 @@ GetConfDir:
 	{
 		tmpNm := A_LoopFileName
 		tmpExt := A_LoopFileExt
-		if (tmpNm ~= "i)Fast Track")										; exclude Fast Track files and folders
+		if (tmpNm ~= "i)Fast.Track|-FT|\sFT")								; exclude Fast Track files and folders
 			continue
 		if (tmpExt) {														; evaluate files with extensions
-			if (tmpNm ~= "i)(\~\$|(Fast Track))")							; exclude temp and "Fast Track" files
+			if (tmpNm ~= "i)(\~\$|(Fast.Track|-FT|\sFT))")					; exclude temp and "Fast Track" files
 				continue
 			if (tmpNm ~= "i)(PCC)?.*\d{1,2}\.\d{1,2}\.\d{2,4}.*xls") {		; find XLS that matches PCC 3.29.16.xlsx
 				confXls := tmpNm
@@ -456,7 +464,7 @@ PatLGuiClose:
 	WinClose, % patName " ahk_exe explorer.exe"
 	
 	Gui, PatL:Destroy																	; destroy PatList GUI
-	if (Presenter) {																	; update Takt time for Presenter only
+	if (isPresenter) {																	; update Takt time for Presenter only
 		PatTime -= A_Now, Seconds														; time diff for time patient data opened
 		gXml.setAtt("/root/id[@name='" patName "']",{dur:-PatTime})						; update gXML with new total dur
 		gXml.save("guac.xml")															; save gXML
@@ -468,7 +476,7 @@ Return
 
 PatConsole:
 {
-	if !(Presenter)																		; only display console in Presenter mode
+	if !(isPresenter)																	; only display console in Presenter mode
 		return
 	SysGet, scr, Monitor																; get display port info into "scr"
 	Gui, PatCx:Default
