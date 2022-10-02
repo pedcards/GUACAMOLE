@@ -14,7 +14,7 @@ Initialization:
 {
 	/*	Set environment and vars
 	*/
-	global user, isDevt, netdir, chipdir, confDT, isPresenter
+	global user, isDevt, netdir, chipdir, confStart, isPresenter
 		, y, arch, dateDir, confTime
 		, winDim
 
@@ -24,12 +24,12 @@ Initialization:
 		isDevt := true
 		netdir := A_WorkingDir "\devfiles\Tuesday_Conference"						; local files
 		chipdir := A_WorkingDir "\devfiles\CHIPOTLE\"
-		confDT := "20220614140000"
+		confStart := "20220614140000"
 	} else {
 		isDevt := false
 		netdir := "\\childrens\files\HCConference\Tuesday_Conference"				; networked Conference folder
 		chipdir := "\\childrens\files\HCChipotle\"									; and CHIPOTLE files
-		confDT := A_Now
+		confStart := A_Now
 	}
 	MsgBox, 36, GUACAMOLE, Are you launching GUACAMOLE for patient presentation?
 	IfMsgBox Yes
@@ -111,8 +111,8 @@ confTimer() {
 	GuiControl, main:Text, CTime, % tmp												; Update the main GUI current time
 	
 	if (isPresenter) {																; For presenter only,
-		tt := elapsed(confDT,A_Now)													; Total time elapsed
-		GuiControl, main:Text, CDur, % tt.hh ":" tt.mm ":" tt.ss					; Update the main GUI elapsed time
+		tt := elapsed(confStart,A_Now)													; Total time elapsed
+		GuiControl, main:Text, CDur, % tt.HHMMSS									; Update the main GUI elapsed time
 	}
 	Return
 }
