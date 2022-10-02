@@ -71,18 +71,20 @@ MainGUI:
 	Gui, main:Default
 	Gui, Destroy
 	Gui, Font, s16 wBold
-	Gui, Add, Text, y0 x20 vCTime, % "              "								; Conference real time
-	Gui, Add, Text, % "y0 x" winDim.gw-120 " vCDur", % "              "				; Conference duration (only exists for Presenter)
+	Gui, Add, Text, y26 x20 vCTime, % "              "								; Conference real time
+	Gui, Add, Text, % "y26 x" winDim.gw-100 " vCDur", % "              "			; Conference duration (only exists for Presenter)
 	Gui, Add, Text, % "y0 x0 w" winDim.gw " h20 +Center", .-= GUACAMOLE =-.
 	Gui, Font, wNorm s8 wItalic
 	Gui, Add, Text, yp+30 xp wp +Center, General Use Access for Conference Archive
 	Gui, Add, Text, yp+14 xp wp +Center, Merged OnLine Elements
+	Gui, Add, Text, y10 x54, Time
+	Gui, Add, Text, % "y10 x" winDim.gw-72, Duration
 	Gui, Font, wBold
 	Gui, Font, wNorm
 	Gosub GetConfDir																; Draw the pateint grid ListView
 	Gui, Add, Button, wp +Center gDateGUI, % dt.MM "/" dt.DD "/" dt.YYYY			; Date selector button
 	Gui, Show, AutoSize, % "GUACAMOLE Main - " dt.MM "/" dt.DD "/" dt.YYYY			; Show GUI with seleted conference DT
-Return
+	Return
 }
 
 DateGUI:
