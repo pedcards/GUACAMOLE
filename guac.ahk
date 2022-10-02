@@ -53,7 +53,7 @@ if (firstRun) {
 	SplashImage, off
 	firstRun := false
 }
-SetTimer, confTime, 1000															; Update ConfTime every 1000 ms
+SetTimer, confTimer, 1000															; Update ConfTime every 1000 ms
 WinWaitClose, GUACAMOLE Main														; wait until main GUI is closed
 ExitApp
 
@@ -104,8 +104,7 @@ DateChoose:
 	return
 }
 
-ConfTime:
-{
+confTimer() {
 	FormatTime, tmp, , HH:mm:ss														; Format the current time
 	GuiControl, main:Text, CTime, % tmp												; Update the main GUI current time
 	
@@ -113,7 +112,7 @@ ConfTime:
 		tt := elapsed(confDT,A_Now)													; Total time elapsed
 		GuiControl, main:Text, CDur, % tt.hh ":" tt.mm ":" tt.ss					; Update the main GUI elapsed time
 	}
-return
+	Return
 }
 
 elapsed(start,end) {
