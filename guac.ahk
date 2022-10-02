@@ -15,6 +15,7 @@ Initialization:
 	/*	Set environment and vars
 	*/
 	global user, isDevt, netdir, chipdir, ConfStart, isPresenter
+		, y, arch, dateDir, confTime
 
 	user := A_UserName
 	IfInString, A_WorkingDir, AhkProjects
@@ -50,7 +51,7 @@ if (firstRun) {
 	SplashImage, off
 	firstRun := false
 }
-SetTimer, ConfTime, 1000															; Update ConfTime every 1000 ms
+SetTimer, confTime, 1000															; Update ConfTime every 1000 ms
 WinWaitClose, GUACAMOLE Main														; wait until main GUI is closed
 ExitApp
 
