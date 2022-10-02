@@ -16,6 +16,7 @@ Initialization:
 	*/
 	global user, isDevt, netdir, chipdir, confDT, isPresenter
 		, y, arch, dateDir, confTime
+		, winDim
 
 	user := A_UserName
 	IfInString, A_WorkingDir, AhkProjects
@@ -43,6 +44,7 @@ Initialization:
 	arch := new XML(chipdir "archlist.xml")											; Get archive.xml
 	datedir := Object()
 	mo := ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
+	winDim := {gw:1200,gh:400}
 }
 
 Gosub MainGUI																		; Draw the main GUI
