@@ -205,7 +205,9 @@ GetConfDir:
 	gXml.save("guac.xml")													; Write Guac XML
 	
 	Gui, Font, s16
-	Gui, Add, ListView, % "r" confList.length() " x20 w720 Hdr AltSubmit Grid BackgroundSilver NoSortHdr NoSort gPatDir", Name|Done|Takt|Diagnosis|Note
+	Gui, Add, ListView, % "r" confList.length() " x20 w" windim.gw-40 
+		. " Hdr AltSubmit Grid BackgroundSilver NoSortHdr NoSort gPatDir"
+		, Name|Done|Takt|Diagnosis|Note
 	Progress, % (firstRun)?"off":"",,Rendering conference list
 	for key,val in confList
 	{
