@@ -14,6 +14,8 @@ Initialization:
 {
 	/*	Set environment and vars
 	*/
+	global user, isDevt, netdir, chipdir, ConfStart, isPresenter
+
 	user := A_UserName
 	IfInString, A_WorkingDir, AhkProjects
 	{
