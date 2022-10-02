@@ -31,9 +31,9 @@ Initialization:
 	}
 	MsgBox, 36, GUACAMOLE, Are you launching GUACAMOLE for patient presentation?
 	IfMsgBox Yes
-		Presenter := true
+		isPresenter := true
 	else
-		Presenter := false
+		isPresenter := false
 
 	firstRun := true
 	SplashImage, % chipDir "guac.jpg", B2 
@@ -106,7 +106,7 @@ ConfTime:
 	FormatTime, tmp, , HH:mm:ss														; Format the current time
 	GuiControl, main:Text, CTime, % tmp												; Update the main GUI current time
 	
-	if (Presenter) {																; For presenter only,
+	if (isPresenter) {																; For presenter only,
 		tt := elapsed(ConfStart,A_Now)												; Total time elapsed
 		GuiControl, main:Text, CDur, % tt.hh ":" tt.mm ":" tt.ss					; Update the main GUI elapsed time
 	}
@@ -463,7 +463,7 @@ PatLGuiClose:
 	WinClose, % patName " ahk_exe explorer.exe"
 	
 	Gui, PatL:Destroy																	; destroy PatList GUI
-	if (Presenter) {																	; update Takt time for Presenter only
+	if (isPresenter) {																	; update Takt time for Presenter only
 		PatTime -= A_Now, Seconds														; time diff for time patient data opened
 		gXml.setAtt("/root/id[@name='" patName "']",{dur:-PatTime})						; update gXML with new total dur
 		gXml.save("guac.xml")															; save gXML
@@ -475,7 +475,7 @@ Return
 
 PatConsole:
 {
-	if !(Presenter)																		; only display console in Presenter mode
+	if !(isPresenter)																	; only display console in Presenter mode
 		return
 	SysGet, scr, Monitor																; get display port info into "scr"
 	Gui, PatCx:Default
