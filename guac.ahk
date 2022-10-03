@@ -403,17 +403,32 @@ PatDir() {
 	Loop, Files, % ptVal.path "\*" , F													; read only files in patDir filepath
 	{
 		name := A_LoopFileName
+		if (name="") {
+			continue
+		}
 		if (name~="i)(\~\$|Thumbs.db)") {												; exclude ~$ temp and thumbs.db files
 			continue
 		}
 		if (name~="i)(?=^.*(PCC|note)\.doc)(?!^.+(CXR|cath|echo|mri))") {				; match "*PCC|note*.doc*" (exclude studies)
 			ptVal.pdoc := ptVal.path "\" name
+			filelist .= "0:" name "`n"
 		}
-		ptVal.filelist .= (name) ? name "|" : ""										; if exists, append name to listbox "filelist"
-		ptVal.filenum ++																; increment filenum (total files added)
-		ptVal.fileNmax := (StrLen(name)>fileNmax) ? StrLen(name) : fileNmax				; Increase max filename length
+		else if (name~="i)EKG|ECG") {
+			filelist .= "1:" name "`n"
+		}
+		else if (name~="i)CXR") {
+			filelist .= "2:" name "`n"
+		}
+		else if (name~="i)\sCath\s|PedCath|Cath\.") {
+			filelist .= "3:" name "`n"
+		}
+		else {
+			filelist .= name "`n"
+		}
+		; ptVal.filelist .= (name) ? name "|" : ""										; if exists, append name to listbox "filelist"
+		; ptVal.filenum ++																; increment filenum (total files added)
+		; ptVal.fileNmax := (StrLen(name)>fileNmax) ? StrLen(name) : fileNmax				; Increase max filename length
 	}
-	if (ptVal.filelist="") {															; empty filelist string
 		MsgBox No files
 		Gui, mainUI:Show																; redisplay main GUI
 		return
