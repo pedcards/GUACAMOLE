@@ -89,6 +89,16 @@ MainGUI:
 	Return
 }
 
+mainGuiClose:
+{
+	MsgBox, 36, Exit, Do you really want to quit GUACAMOLE?
+	IfMsgBox No
+	{
+		Return
+	} 
+	ExitApp
+}
+
 DateGUI:
 {
 	Gui, date:Default
@@ -135,16 +145,6 @@ formatSec(time) {
 	MM := floor((time-HH*3600)/60)													; Derive MM from remainder of HH
 	SS := time-HH*3600-MM*60														; Derive SS from remainder of MM
 	Return {"hh":zDigit(HH), "mm":zDigit(MM), "ss":zDigit(SS)}
-}
-
-mainGuiClose:
-{
-	MsgBox, 36, Exit, Do you really want to quit GUACAMOLE?
-	IfMsgBox No
-	{
-		Return
-	} 
-	ExitApp
 }
 
 GetConfDate(dt:="") {
