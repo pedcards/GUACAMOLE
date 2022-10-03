@@ -101,7 +101,7 @@ mainGuiClose:
 
 DateGUI:
 {
-	Gui, date:Default
+	Gui, dateUI:Default
 	Gui, Destroy
 	Gui, +AlwaysOnTop
 	Gui, Add, MonthCal, vEncDt gDateChoose, % confDate.YMD							; Show selected date and month selector
@@ -111,7 +111,7 @@ DateGUI:
 
 DateChoose:
 {
-	Gui, date:Destroy																; Close MonthCal UI
+	Gui, dateUI:Destroy																; Close MonthCal UI
 	confDate := GetConfDate(EncDt)													; Reacquire DT based on value
 	conflist =																		; Clear out confList
 	Gosub MainGUI																	; Redraw MainGUI
