@@ -211,7 +211,7 @@ GetConfDir() {
 	}
 	if (confXls) {															; Read confXls if present
 		Progress, % (firstRun)?"off":"",,Reading XLS file
-		gosub readXls
+		readXls()
 	}
 	gXml.save("guac.xml")													; Write Guac XML
 	Return
@@ -286,8 +286,9 @@ NetConfDir(yyyy:="",mmm:="",dd:="") {
 return yyyy "\" datedir[yyyy,mmm].dir "\" datedir[yyyy,mmm,dd]		; returns path to that date's conference 
 }
 
-ReadXls:
-{
+readXls() {
+	global gXml, confXls, netDir, confDir
+
 	tmpDT:=gXml.selectSingleNode("/root/done").text					; last time ReadXLS run
 	FileGetTime, tmpDiff, % confXls									; get XLS modified time
 	tmpDiff -= tmpDT												; Compare XLS-XML time diff
