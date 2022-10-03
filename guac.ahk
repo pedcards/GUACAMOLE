@@ -57,15 +57,15 @@ SetTimer, confTimer, 1000															; Update ConfTime every 1000 ms
 WinWaitClose, GUACAMOLE Main														; wait until main GUI is closed
 ExitApp
 
-;	===========================================================================================
+;	== MAIN GUI =========================================================================================
 
 MainGUI:
 {
-	if !IsObject(dt) {
+	if !IsObject(confDate) {
 		if (isDevt) {
-			dt := GetConfDate("20220614")											; use test dir. change this if want "live" handling
+			confDate := GetConfDate("20220614")										; use test dir. change this if want "live" handling
 		} else {
-			dt := GetConfDate()														; determine next conference date into array dt
+			confDate := GetConfDate()												; determine next conference date into array dt
 		}
 	}
 	Gui, main:Default
@@ -82,8 +82,8 @@ MainGUI:
 	Gui, Font, wBold
 	Gui, Font, wNorm
 	Gosub GetConfDir																; Draw the pateint grid ListView
-	Gui, Add, Button, wp +Center gDateGUI, % dt.MM "/" dt.DD "/" dt.YYYY			; Date selector button
-	Gui, Show, AutoSize, % "GUACAMOLE Main - " dt.MM "/" dt.DD "/" dt.YYYY			; Show GUI with seleted conference DT
+	Gui, Add, Button, wp +Center gDateGUI, % confDate.MDY							; Date selector button
+	Gui, Show, AutoSize, % "GUACAMOLE Main - " confDate.MDY							; Show GUI with seleted conference DT
 	Return
 }
 
@@ -92,7 +92,7 @@ DateGUI:
 	Gui, date:Default
 	Gui, Destroy
 	Gui, +AlwaysOnTop
-	Gui, Add, MonthCal, vEncDt gDateChoose, % dt.YYYY dt.MM dt.DD					; Show selected date and month selector
+	Gui, Add, MonthCal, vEncDt gDateChoose, % confDate.YMD							; Show selected date and month selector
 	Gui, Show, AutoSize, Select PCC date...
 	return
 }
@@ -100,7 +100,7 @@ DateGUI:
 DateChoose:
 {
 	Gui, date:Destroy																; Close MonthCal UI
-	dt := GetConfDate(EncDt)														; Reacquire DT based on value
+	confDate := GetConfDate(EncDt)													; Reacquire DT based on value
 	conflist =																		; Clear out confList
 	Gosub MainGUI																	; Redraw MainGUI
 	return
@@ -157,7 +157,8 @@ GetConfDate(dt:="") {
 		dt += (3-Wday), days
 	}
 	conf := breakdate(dt)
-	return {YYYY:conf.YYYY, MM:conf.MM, MMM:conf.MMM, DD:conf.DD}
+	return {YYYY:conf.YYYY, MM:conf.MM, MMM:conf.MMM, DD:conf.DD
+		, YMD:conf.YMD, MDY:conf.MDY}
 }
 
 GetConfDir:
@@ -611,7 +612,9 @@ breakDate(x) {
 	FormatTime, D_day, %x%, ddd
 	FormatTime, D_Mon, %x%, MMM
 	return {"YYYY":D_Yr, "MM":D_Mo, "MMM":D_Mon, "DD":D_Da, "ddd":D_day
-		, "HH":D_Hr, "min":D_Min, "sec":D_sec}
+		, "HH":D_Hr, "min":D_Min, "sec":D_sec
+		, "YMD":D_Yr D_Mo D_Da
+		, "MDY":D_Mo "/" D_Da "/" D_Yr}
 }
 niceDate(x) {
 	if !(x)
