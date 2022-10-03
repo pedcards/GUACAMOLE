@@ -373,77 +373,85 @@ readXls() {
 	Return
 }
 
-PatDir:
-{
-	if !(A_GuiEvent = "DoubleClick")								; Only respond to double-click in GetConfDir listview
+;	== PATIENT DIR ACTIVITIES =========================================================================================
+
+PatDir() {
+	global confList, gXml, netDir, confDir, ptVal, mainUI, patL, pTxt
+
+	if !(A_GuiEvent = "DoubleClick")													; Only respond to double-click in GetConfDir listview
 		return
-	if WinExist("[Guac] Patient:") {								; if another PatL window still open, close it and all associated windows
+	if WinExist("[Guac] Patient:") {													; if another PatL window still open, close it and all associated windows
 		Gosub PatLGuiClose
 	}
-	gXml := new XML("guac.xml")										; refresh gXml from guac.xml
-
-	Gui, Main:Submit, NoHide										; use Submit to update variables
-	PatName := confList[A_EventInfo]								; get PatName from confList pointer from A_EventInfo; could we just get the first column?
-	PatTime := A_Now												; timer start
-	PatTime += -gXml.getAtt("/root/id[@name='" patName "']","dur"), Seconds		; add to previous cumulative dur time from gXml
-	filepath := netdir "\" confdir "\" RegExReplace(PatName,"_","'")						; PatName is name of folder
-	filePmax = 														; clear max file field length
-	fileNmax =														; clear max filename length
-	filelist =														; clear out filelist
-	filenum =														; clear total valid files
-	pt = 															; clear patient text from Chipotle
+	gXml := new XML("guac.xml")															; refresh gXml from guac.xml
 	
-	Loop, Files, % filepath "\*" , F													; read only files in patDir filepath
+	Gui, mainUI:Submit, NoHide															; use Submit to update variables
+	ptVal := {}
+	ptVal.Name := confList[A_EventInfo]													; Name from confList pointer from A_EventInfo; could we just get the first column?
+	ptVal.ID := "/root/id[@name='" ptVal.Name "']"										; xPath string for gXml
+	ptVal.Time := A_Now																	; timer start
+	ptVal.Time += -gXml.getAtt(ptVal.ID,"dur"), Seconds									; add to previous cumulative dur time from gXml
+	ptVal.path := netdir "\" confdir "\" RegExReplace(ptVal.Name,"_","'")				; PatName is name of folder
+	ptVal.gXml := gXml.selectSingleNode(ptVal.ID)										; gXml node for PATIENT NAME
+	ptVal.MRN := ptVal.gXml.getAttribute("mrn")											; MRN from gXmlPt node
+	ptVal.filePmax := 																	; clear max file field length
+	ptVal.fileNmax :=																	; clear max filename length
+	ptVal.filelist :=																	; clear out filelist
+	ptVal.filenum := 0																	; clear total valid files
+	pTxt := checkChip(ptVal.MRN)														; check Chipotle currlist (#1) and archlist (#2) for MRN, returns in obj pt
+
+	Loop, Files, % ptVal.path "\*" , F													; read only files in patDir filepath
 	{
 		name := A_LoopFileName
 		if (name~="i)(\~\$|Thumbs.db)") {												; exclude ~$ temp and thumbs.db files
 			continue
 		}
-		pdoc := (name~="i)(?<!CXR)(PCC|note)?.*\.doc") ? filepath "\" name : ""			; match "*PCC|note*.doc*" (exclude CXR), pdoc is complete filepath to doc, else ""
-		filelist .= (name) ? name "|" : ""												; if exists, append name to listbox "filelist"
-		filenum ++																		; increment filenum (total files added)
-		fileNmax := (StrLen(name)>fileNmax) ? StrLen(name) : fileNmax					; Increase max filename length
+		if (name~="i)(?<!CXR)(PCC|note)?.*\.doc") { 									; match "*PCC|note*.doc*" (exclude CXR)
+			ptVal.pdoc := ptVal.path "\" name
+		}
+		ptVal.filelist .= (name) ? name "|" : ""										; if exists, append name to listbox "filelist"
+		ptVal.filenum ++																; increment filenum (total files added)
+		ptVal.fileNmax := (StrLen(name)>fileNmax) ? StrLen(name) : fileNmax				; Increase max filename length
 	}
-	
-	patLBw := (fileNmax>32) ? (fileNmax-32)*12+360 : 360								; listbox width has min 360px, adds 12px for each char over 32		*** could probably consolidate this ***
-	
-	if !(filelist) {																	; empty filelist string
+	if (ptVal.filelist="") {															; empty filelist string
 		MsgBox No files
 		Gui, mainUI:Show																; redisplay main GUI
 		return
 	}
+	ptVal.ListBoxWidth := (ptVal.fileNmax>32) ? (ptVal.fileNmax-32)*12+360 : 360		; listbox width has min 360px, adds 12px for each char over 32		*** could probably consolidate this ***
 	
-	gXmlPt := gXml.selectSingleNode("/root/id[@name='" patName "']")					; gXml node for PATIENT NAME
-	patMRN := gXmlPt.getAttribute("mrn")												; MRN from gXmlPt node
-	
+	Gosub patDirGUI
+
+	Return
+}
+
+PatDirGUI:
+{
 	Gui, PatL:Default
 	Gui, Destroy
 	Gui, Font, s16
-	Gui, Add, ListBox, % "r" filenum " section w" patLBw " vPatFile gPatFileGet", % filelist
+	Gui, Add, ListBox, % "r" ptVal.filenum " section w" ptVal.ListBoxWidth " vPatFile gPatFileGet", % ptVal.filelist
 	Gui, Font, s12
 	Gui, Add, Button, wP Disabled vplMRNbut, No MRN found								; default MRN button to Disabled
 	Gui, Add, Button, wP gPatFileGet , Open all files...
 	Gui, Font, s8
-	if (patMRN) {																		; MRN found in gXML
-		pt := checkChip(patMRN)															; check Chipotle currlist (#1) and archlist (#2) for MRN, returns in obj pt
-		GuiControl, , plMRNbut, % patMRN												; change plMRNbut button to MRN
-	}
-	if IsObject(pt) {																	; pt obj has values if exists in either currlist or archlist
+	GuiControl, , plMRNbut, % (ptVal.MRN) ? ptVal.MRN : No MRN found					; change plMRNbut button to MRN
+	if IsObject(pTxt) {																	; pt obj has values if exists in either currlist or archlist
 		GuiControl, , plMRNbut, CHIPOTLE data											; change plMRNbut button to indicate Chipotle data present
 		Gui, Add, Text, ys x+m r20 w300 wrap vplChipNote, % ""
-			. "CHIPOTLE data (from " niceDate(pt.dxEd) ")`n" 							; generate CHIPOTLE data string for sidebar
-			. ((pt.dxCard)  ? "Diagnoses:`n" pt.dxCard "`n`n" : "")
-			. ((pt.dxSurg)  ? "Surgeries/Caths:`n" pt.dxSurg "`n`n" : "")
-			. ((pt.dxEP)    ? "EP issues:`n" pt.dxEP "`n`n" : "")
-			. ((pt.dxProb)  ? "Problems:`n" pt.dxProb "`n`n" : "")
-			. ((pt.dxNotes) ? "Notes:`n" pt.dxNotes : "")
+			. "CHIPOTLE data (from " niceDate(pTxt.dxEd) ")`n" 							; generate CHIPOTLE data string for sidebar
+			. ((pTxt.dxCard)  ? "Diagnoses:`n" pTxt.dxCard "`n`n" : "")
+			. ((pTxt.dxSurg)  ? "Surgeries/Caths:`n" pTxt.dxSurg "`n`n" : "")
+			. ((pTxt.dxEP)    ? "EP issues:`n" pTxt.dxEP "`n`n" : "")
+			. ((pTxt.dxProb)  ? "Problems:`n" pTxt.dxProb "`n`n" : "")
+			. ((pTxt.dxNotes) ? "Notes:`n" pTxt.dxNotes : "")
 	}
-	Gui, Show, w800 AutoSize, % "[Guac] Patient: " PatName
+	Gui, Show, w800 AutoSize, % "[Guac] Patient: " ptVal.Name
 	
 	Gosub PatConsole																	; launch PatConsole for patient clock, "Close All", "Open file", etc.
 	SetTimer, PatCxTimer, 500															; start clock for PatCxTimer
 
-	if IsObject(pt) {																	; pt obj had values, added CHIPOTLE data sidebar
+	if IsObject(pTxt) {																	; pt obj had values, added CHIPOTLE data sidebar
 		return																			; finish
 	}
 	if (patMRN) {																		; still have MRN but done
@@ -458,7 +466,7 @@ PatDir:
 		ptmp := parsePatDoc(pdoc)														; populate pdoc obj as array of document section text blocks
 		gXmlPt.setAttribute("mrn",ptmp.MRN)												; add found MRN to gXML
 		gXml.save("guac.xml")															; save the changes to gXML
-		gosub PatDir																	; redraw entire patDir GUI
+		PatDir()																		; redraw entire patDir GUI
 	}
 	return
 }
