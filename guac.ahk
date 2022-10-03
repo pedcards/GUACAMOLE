@@ -406,7 +406,7 @@ PatDir() {
 		if (name~="i)(\~\$|Thumbs.db)") {												; exclude ~$ temp and thumbs.db files
 			continue
 		}
-		if (name~="i)(?<!CXR)(PCC|note)?.*\.doc") { 									; match "*PCC|note*.doc*" (exclude CXR)
+		if (name~="i)(?=^.*(PCC|note)\.doc)(?!^.+(CXR|cath|echo|mri))") {				; match "*PCC|note*.doc*" (exclude studies)
 			ptVal.pdoc := ptVal.path "\" name
 		}
 		ptVal.filelist .= (name) ? name "|" : ""										; if exists, append name to listbox "filelist"
