@@ -83,7 +83,7 @@ MainGUI:
 	Gui, Add, Text, % "y10 x" winDim.gw-72, Duration
 	Gui, Font, wBold
 	Gui, Font, wNorm
-	Gosub GetConfDir																; Draw the pateint grid ListView
+	makeConfLV()																	; Draw the pateint grid ListView
 	Gui, Add, Button, wp +Center gDateGUI, % confDate.MDY							; Date selector button
 	Gui, Show, AutoSize, % "GUACAMOLE Main - " confDate.MDY							; Show GUI with seleted conference DT
 	Return
@@ -217,6 +217,10 @@ GetConfDir() {
 	Return
 }
 
+makeConfLV() {
+	global confList, winDim, gXml, main
+
+	Gui, main:Default
 	Gui, Font, s16
 	Gui, Add, ListView, % "r" confList.length() " x20 w" windim.gw-20
 		. " Hdr AltSubmit Grid BackgroundSilver NoSortHdr NoSort gPatDir"
