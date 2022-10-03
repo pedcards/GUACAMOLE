@@ -222,7 +222,7 @@ makeConfLV() {
 
 	Gui, main:Default
 	Gui, Font, s16
-	Gui, Add, ListView, % "r" confList.length() " x20 w" windim.gw-20
+	Gui, Add, ListView, % "r" confList.length()+1 " x20 w" windim.gw-20
 		. " Hdr AltSubmit Grid BackgroundSilver NoSortHdr NoSort gPatDir"
 		, Name|Done|Takt|Diagnosis|Note
 	Progress, % (firstRun)?"off":"",,Rendering conference list
