@@ -68,6 +68,8 @@ MainGUI:
 			confDate := GetConfDate()												; determine next conference date into array dt
 		}
 	}
+	GetConfDir()																	; find confList, confXls, gXml
+
 	Gui, main:Default
 	Gui, Destroy
 	Gui, Font, s16 wBold
@@ -161,9 +163,13 @@ GetConfDate(dt:="") {
 		, YMD:conf.YMD, MDY:conf.MDY}
 }
 
-GetConfDir:
-{
-	confDir := NetConfDir(dt.YYYY,dt.mmm,dt.dd)								; get path to conference folder based on predicted date "dt"
+GetConfDir() {
+/*	Find conference folder path for confDate
+	Get list of patient folders, push to confList, save in guac.xml
+*/
+	global confDate, confList, confXls, firstRun, gXml, confDir
+
+	confDir := NetConfDir(confDate.YYYY,confDate.mmm,confDate.dd)			; get path to conference folder based on predicted date "confDate"
 	SetWorkingDir % netdir "\" confDir
 	if !IsObject(confList) {												; make sure confList array exists
 		confList := {}
@@ -195,7 +201,7 @@ GetConfDir:
 		}
 		tmpNm := RegExReplace(tmpNm,"\'","_")
 		if !IsObject(confList[tmpNm]) {										; confList is empty
-			tmpNmUP := RegExReplace(format("{:U}",tmpNm),"\'","_")									; place filename in all UPPER CASE
+			tmpNmUP := RegExReplace(format("{:U}",tmpNm),"\'","_")			; place filename in all UPPER CASE
 			confList.Push(tmpNmUP)											; add it to end of confList
 			confList[tmpNmUP] := {name:tmpNm,done:0,note:""}				; name=actual filename, done=no, note=cleared
 		}
@@ -208,7 +214,9 @@ GetConfDir:
 		gosub readXls
 	}
 	gXml.save("guac.xml")													; Write Guac XML
-	
+	Return
+}
+
 	Gui, Font, s16
 	Gui, Add, ListView, % "r" confList.length() " x20 w" windim.gw-20
 		. " Hdr AltSubmit Grid BackgroundSilver NoSortHdr NoSort gPatDir"
