@@ -429,10 +429,14 @@ PatDir() {
 		; ptVal.filenum ++																; increment filenum (total files added)
 		; ptVal.fileNmax := (StrLen(name)>fileNmax) ? StrLen(name) : fileNmax				; Increase max filename length
 	}
+	if (filelist="") {															; empty filelist string
 		MsgBox No files
 		Gui, mainUI:Show																; redisplay main GUI
 		return
 	}
+	Sort, filelist
+	filelist := trim(RegExReplace(filelist, "(\r\n)*\d:"),"`n")
+	ptVal.filelist := StrReplace(filelist, "`n", "|")
 	ptVal.ListBoxWidth := (ptVal.fileNmax>32) ? (ptVal.fileNmax-32)*12+360 : 360		; listbox width has min 360px, adds 12px for each char over 32		*** could probably consolidate this ***
 	
 	Gosub patDirGUI
