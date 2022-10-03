@@ -44,7 +44,7 @@ Initialization:
 	arch := new XML(chipdir "archlist.xml")											; Get archive.xml
 	datedir := Object()
 	mo := ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
-	winDim := {gw:1200,gh:400}
+	winDim := {gw:1200,gh:400,scrX:A_ScreenWidth,scrY:A_ScreenHeight}
 }
 
 Gosub MainGUI																		; Draw the main GUI
