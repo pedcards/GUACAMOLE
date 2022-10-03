@@ -70,7 +70,7 @@ MainGUI:
 	}
 	GetConfDir()																	; find confList, confXls, gXml
 
-	Gui, main:Default
+	Gui, mainUI:Default
 	Gui, Destroy
 	Gui, Font, s16 wBold
 	Gui, Add, Text, y26 x20 vCTime, % "              "								; Conference real time
@@ -120,11 +120,11 @@ DateChoose:
 
 confTimer() {
 	FormatTime, tmp, , HH:mm:ss														; Format the current time
-	GuiControl, main:Text, CTime, % tmp												; Update the main GUI current time
+	GuiControl, mainUI:Text, CTime, % tmp											; Update the main GUI current time
 	
 	if (isPresenter) {																; For presenter only,
-		tt := elapsed(confStart,A_Now)													; Total time elapsed
-		GuiControl, main:Text, CDur, % tt.HHMMSS									; Update the main GUI elapsed time
+		tt := elapsed(confStart,A_Now)												; Total time elapsed
+		GuiControl, mainUI:Text, CDur, % tt.HHMMSS									; Update the main GUI elapsed time
 	}
 	Return
 }
@@ -218,9 +218,9 @@ GetConfDir() {
 }
 
 makeConfLV() {
-	global confList, winDim, gXml, main
+	global confList, winDim, gXml, mainUI
 
-	Gui, main:Default
+	Gui, mainUI:Default
 	Gui, Font, s16
 	Gui, Add, ListView, % "r" confList.length()+1 " x20 w" windim.gw-20
 		. " Hdr AltSubmit Grid BackgroundSilver NoSortHdr NoSort gPatDir"
@@ -409,7 +409,7 @@ PatDir:
 	
 	if !(filelist) {																	; empty filelist string
 		MsgBox No files
-		Gui, main:Show																	; redisplay main GUI
+		Gui, mainUI:Show																; redisplay main GUI
 		return
 	}
 	
