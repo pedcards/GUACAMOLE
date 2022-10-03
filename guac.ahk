@@ -448,7 +448,11 @@ PatDirGUI:
 {
 	Gui, PatL:Default
 	Gui, Destroy
-	Gui, Font, s16
+	; Gui, Font, s16
+	Gui, Add, Tab3
+		, % "-Wrap x10 y10 w" winDim.scrX-20 " h800 vFtab +HwndFtab Buttons"
+		, % trim(ptVal.filelist,"|")
+
 	Gui, Add, ListBox, % "r" ptVal.filenum " section w" ptVal.ListBoxWidth " vPatFile gPatFileGet", % ptVal.filelist
 	Gui, Font, s12
 	Gui, Add, Button, wP Disabled vplMRNbut, No MRN found								; default MRN button to Disabled
