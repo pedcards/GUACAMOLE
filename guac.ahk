@@ -452,7 +452,7 @@ PatDirGUI:
 	Gui, Destroy
 	; Gui, Font, s16
 	Gui, Add, Tab3
-		, % "-Wrap x10 y10 w" winDim.scrX-20 " h800 vFtab +HwndFtab Buttons"
+		, % "-Wrap x10 y10 w" winDim.scrX-20 " h800 vFtab +HwndFtab -Buttons"
 		, % trim(ptVal.filelist,"|")
 
 	Gui, Add, ListBox, % "r" ptVal.filenum " section w" ptVal.ListBoxWidth " vPatFile gPatFileGet", % ptVal.filelist
