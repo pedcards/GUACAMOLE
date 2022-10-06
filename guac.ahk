@@ -463,22 +463,22 @@ PatDirGUI:
 	; fc.CreateNew("Excel.Sheet")
 	; fc.ActiveDocument.Sheets(1).Range("A1").Value := "test"
 
-	Gui, Add, ListBox, % "r" ptVal.filenum " section w" ptVal.ListBoxWidth " vPatFile gPatFileGet", % ptVal.filelist
-	Gui, Font, s12
-	Gui, Add, Button, wP Disabled vplMRNbut, No MRN found								; default MRN button to Disabled
-	Gui, Add, Button, wP gPatFileGet , Open all files...
-	Gui, Font, s8
-	GuiControl, , plMRNbut, % (ptVal.MRN) ? ptVal.MRN : No MRN found					; change plMRNbut button to MRN
-	if IsObject(pTxt) {																	; pt obj has values if exists in either currlist or archlist
-		GuiControl, , plMRNbut, CHIPOTLE data											; change plMRNbut button to indicate Chipotle data present
-		Gui, Add, Text, ys x+m r20 w300 wrap vplChipNote, % ""
-			. "CHIPOTLE data (from " niceDate(pTxt.dxEd) ")`n" 							; generate CHIPOTLE data string for sidebar
-			. ((pTxt.dxCard)  ? "Diagnoses:`n" pTxt.dxCard "`n`n" : "")
-			. ((pTxt.dxSurg)  ? "Surgeries/Caths:`n" pTxt.dxSurg "`n`n" : "")
-			. ((pTxt.dxEP)    ? "EP issues:`n" pTxt.dxEP "`n`n" : "")
-			. ((pTxt.dxProb)  ? "Problems:`n" pTxt.dxProb "`n`n" : "")
-			. ((pTxt.dxNotes) ? "Notes:`n" pTxt.dxNotes : "")
-	}
+	; Gui, Add, ListBox, % "r" ptVal.filenum " section w" ptVal.ListBoxWidth " vPatFile gPatFileGet", % ptVal.filelist
+	; Gui, Font, s12
+	; Gui, Add, Button, wP Disabled vplMRNbut, No MRN found								; default MRN button to Disabled
+	; Gui, Add, Button, wP gPatFileGet , Open all files...
+	; Gui, Font, s8
+	; GuiControl, , plMRNbut, % (ptVal.MRN) ? ptVal.MRN : No MRN found					; change plMRNbut button to MRN
+	; if IsObject(pTxt) {																	; pt obj has values if exists in either currlist or archlist
+	; 	GuiControl, , plMRNbut, CHIPOTLE data											; change plMRNbut button to indicate Chipotle data present
+	; 	Gui, Add, Text, ys x+m r20 w300 wrap vplChipNote, % ""
+	; 		. "CHIPOTLE data (from " niceDate(pTxt.dxEd) ")`n" 							; generate CHIPOTLE data string for sidebar
+	; 		. ((pTxt.dxCard)  ? "Diagnoses:`n" pTxt.dxCard "`n`n" : "")
+	; 		. ((pTxt.dxSurg)  ? "Surgeries/Caths:`n" pTxt.dxSurg "`n`n" : "")
+	; 		. ((pTxt.dxEP)    ? "EP issues:`n" pTxt.dxEP "`n`n" : "")
+	; 		. ((pTxt.dxProb)  ? "Problems:`n" pTxt.dxProb "`n`n" : "")
+	; 		. ((pTxt.dxNotes) ? "Notes:`n" pTxt.dxNotes : "")
+	; }
 	Gui, Show, w800 AutoSize, % "[Guac] Patient: " ptVal.Name
 	
 	Gosub PatConsole																	; launch PatConsole for patient clock, "Close All", "Open file", etc.
