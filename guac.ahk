@@ -45,6 +45,8 @@ Initialization:
 	datedir := Object()
 	mo := ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
 	winDim := {gw:1200,gh:400,scrX:A_ScreenWidth,scrY:A_ScreenHeight}
+
+	RegCOM(".\Includes\dsoframer.manifest")
 }
 
 Gosub MainGUI																		; Draw the main GUI
@@ -761,6 +763,20 @@ cleanspace(ByRef txt) {
 			break
 	}
 	return txt
+}
+
+RegCOM(ManifestFile) {
+	VarSetCapacity(actctx, 34, 0)
+	NumPut(34, actctx, 0, "UInt")
+	NumPut(&ManifestFile, actctx, 8, "UInt")
+
+	hActCtx := DllCall("CreateActCtx", "ptr", &actctx, "ptr")
+	if (hActCtx = INVALID_HANDLE_VALUE := -1) {
+		throw, "INVALID_HANDLE_VALUE"
+	}
+
+	DllCall("ActivateActCtx", "ptr", hActCtx, "ptr*", cookie)
+	Return
 }
 
 PtParse(mrn,ByRef y) {
