@@ -454,6 +454,14 @@ PatDirGUI:
 	Gui, Add, Tab3
 		, % "-Wrap x10 y10 w" winDim.scrX-20 " h800 vFtab +HwndFtab -Buttons"
 		, % trim(ptVal.filelist,"|")
+	Gui, Add, ActiveX, w1200 h600 vfc, {00460182-9E5E-11D5-B7C8-B8269041DD57}
+	fc.Menubar := false
+	fc.Toolbars := false
+	fc.Titlebar := false
+	fc.zoom.percentage = 100
+	fc.Open(ptVal.pdoc)
+	; fc.CreateNew("Excel.Sheet")
+	; fc.ActiveDocument.Sheets(1).Range("A1").Value := "test"
 
 	Gui, Add, ListBox, % "r" ptVal.filenum " section w" ptVal.ListBoxWidth " vPatFile gPatFileGet", % ptVal.filelist
 	Gui, Font, s12
