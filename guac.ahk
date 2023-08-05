@@ -147,12 +147,23 @@ GetConfDate(dt:="") {
 		dt += (3-Wday), days
 	}
 	conf := breakdate(dt)
-	return {YYYY:conf.YYYY, MM:conf.MM, MMM:conf.MMM, DD:conf.DD}
+	return {YYYY:conf.YYYY, YY:conf.YY, MM:conf.MM, MMM:conf.MMM, DD:conf.DD}
 }
 
 GetConfDir:
 {
 	confDir := NetConfDir(dt.YYYY,dt.mmm,dt.dd)								; get path to conference folder based on predicted date "dt"
+	if !FileExist(netdir "\" confDir) {
+		SplashImage, Off
+		MsgBox 0x24, Guac files, % "Create conference folder for`n" dt.MM "/" dt.DD "/" dt.YYYY "?"
+		IfMsgBox Yes, {
+			FileCreateDir, % netdir "\" dt.YYYY "\" dt.MM " " dt.MMM "\" dt.MM "." dt.DD "." dt.YY
+			confDir := NetConfDir(dt.YYYY,dt.mmm,dt.dd)
+		} Else {
+			Return
+		}
+	}
+
 	SetWorkingDir % netdir "\" confDir
 	if !IsObject(confList) {												; make sure confList array exists
 		confList := {}
@@ -564,9 +575,10 @@ breakDate(x) {
 	D_Hr := substr(x,9,2)
 	D_Min := substr(x,11,2)
 	D_Sec := substr(x,13,2)
+	D_YY := substr(D_Yr,-1,2)
 	FormatTime, D_day, %x%, ddd
 	FormatTime, D_Mon, %x%, MMM
-	return {"YYYY":D_Yr, "MM":D_Mo, "MMM":D_Mon, "DD":D_Da, "ddd":D_day
+	return {"YYYY":D_Yr, "YY":D_YY, "MM":D_Mo, "MMM":D_Mon, "DD":D_Da, "ddd":D_day
 		, "HH":D_Hr, "min":D_Min, "sec":D_sec}
 }
 niceDate(x) {
