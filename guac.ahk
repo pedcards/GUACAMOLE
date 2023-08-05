@@ -1,4 +1,4 @@
-/* 	GUACAMOLE conference data browser (C)2015 TC
+/* 	GUACAMOLE conference data browser (C)2015-2023 TC
 */
 
 #NoEnv  ; Recommended for performance and compatibility with future AutoHotkey releases.
@@ -24,6 +24,11 @@ Initialization:
 		netdir := A_WorkingDir "\devfiles\Tuesday_Conference"						; local files
 		chipdir := A_WorkingDir "\devfiles\CHIPOTLE\"
 		confDT := "20220614140000"
+		tmp := CMsgBox("Development","Choose date"
+			, confDT "|TODAY")
+		if (tmp="TODAY") {
+			confDT := ""
+		}
 	} else {
 		isDevt := false
 		netdir := "\\childrens\files\HCConference\Tuesday_Conference"				; networked Conference folder
@@ -47,7 +52,6 @@ Initialization:
 
 Gosub MainGUI																		; Draw the main GUI
 if (firstRun) {
-	;~ SoundPlay, % chipDir "chillin.wav", Wait
 	SplashImage, off
 	firstRun := false
 }
