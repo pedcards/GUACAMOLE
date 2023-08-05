@@ -64,11 +64,7 @@ ExitApp
 MainGUI:
 {
 	if !IsObject(dt) {
-		if (isDevt) {
-			dt := GetConfDate("20220614")											; use test dir. change this if want "live" handling
-		} else {
-			dt := GetConfDate()														; determine next conference date into array dt
-		}
+		dt := GetConfDate(confDT)													; determine next conference date into array dt													; 
 	}
 	Gui, main:Default
 	Gui, Destroy
