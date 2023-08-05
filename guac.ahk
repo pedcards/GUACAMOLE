@@ -40,7 +40,7 @@ Initialization:
 		isPresenter := false
 
 	firstRun := true
-	SplashImage, % chipDir "guac.jpg", B2 
+	SplashImage, % netdir "\guac.jpg", B2 
 
 	datedir := Object()
 	mo := ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
