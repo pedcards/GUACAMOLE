@@ -566,10 +566,10 @@ PatFileGet:
 		WinActivate, %patFileLocked%
 		SendInput, {r}{Enter}
 	}
-	if IsObject(oDoc := ComObjGet(filepath "\" patWordPCC)) {
-		oDoc.ActiveWindow.View.Zoom.PageFit := 2								; "wdPageFitTextFit"
-		ComObjConnect(oDoc)														; disconnect object
-	}
+	; if IsObject(oDoc := ComObjGet(filepath "\" patWordPCC)) {
+	; 	oDoc.ActiveWindow.View.Zoom.PageFit := 2								; "wdPageFitTextFit"
+	; 	ComObjConnect(oDoc)														; disconnect object
+	; }
 Return
 }
 
