@@ -377,7 +377,7 @@ PatDir:
 		if (name~="i)(\~\$|Thumbs.db)") {												; exclude ~$ temp and thumbs.db files
 			continue
 		}
-		pdoc := (name~="i)(?<!CXR)(PCC|note)?.*\.doc") ? filepath "\" name : ""			; match "*PCC|note*.doc*" (exclude CXR), pdoc is complete filepath to doc, else ""
+		pdoc := (name~="i)(?<!CXR)(PCC|note)?.*\.(doc|pdf)") ? filepath "\" name : ""	; match "*PCC|note*.doc*" (exclude CXR), pdoc is complete filepath to doc, else ""
 		filelist .= (name) ? name "|" : ""												; if exists, append name to listbox "filelist"
 		filenum ++																		; increment filenum (total files added)
 		fileNmax := (StrLen(name)>fileNmax) ? StrLen(name) : fileNmax					; Increase max filename length
@@ -566,10 +566,10 @@ PatFileGet:
 		WinActivate, %patFileLocked%
 		SendInput, {r}{Enter}
 	}
-	if IsObject(oDoc := ComObjGet(filepath "\" patWordPCC)) {
-		oDoc.ActiveWindow.View.Zoom.PageFit := 2								; "wdPageFitTextFit"
-		ComObjConnect(oDoc)														; disconnect object
-	}
+	; if IsObject(oDoc := ComObjGet(filepath "\" patWordPCC)) {
+	; 	oDoc.ActiveWindow.View.Zoom.PageFit := 2								; "wdPageFitTextFit"
+	; 	ComObjConnect(oDoc)														; disconnect object
+	; }
 Return
 }
 
