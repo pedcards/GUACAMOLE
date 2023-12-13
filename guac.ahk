@@ -1,4 +1,4 @@
-/* 	GUACAMOLE conference data browser (C)2015 TC
+/* 	GUACAMOLE conference data browser (C)2015-2023 TC
 */
 
 #NoEnv  ; Recommended for performance and compatibility with future AutoHotkey releases.
@@ -14,7 +14,7 @@ Initialization:
 {
 	/*	Set environment and vars
 	*/
-	global user, isDevt, netdir, chipdir, confDT, isPresenter
+	global user, isDevt, netdir, confDT, isPresenter
 		, y, arch, dateDir, confTime
 
 	user := A_UserName
@@ -22,12 +22,15 @@ Initialization:
 	{
 		isDevt := true
 		netdir := A_WorkingDir "\devfiles\Tuesday_Conference"						; local files
-		chipdir := A_WorkingDir "\devfiles\CHIPOTLE\"
 		confDT := "20220614140000"
+		tmp := CMsgBox("Development","Choose date"
+			, confDT "|TODAY")
+		if (tmp="TODAY") {
+			confDT := ""
+		}
 	} else {
 		isDevt := false
 		netdir := "\\childrens\files\HCConference\Tuesday_Conference"				; networked Conference folder
-		chipdir := "\\childrens\files\HCChipotle\"									; and CHIPOTLE files
 		confDT := A_Now
 	}
 	MsgBox, 36, GUACAMOLE, Are you launching GUACAMOLE for patient presentation?
@@ -37,17 +40,14 @@ Initialization:
 		isPresenter := false
 
 	firstRun := true
-	SplashImage, % chipDir "guac.jpg", B2 
+	SplashImage, % netdir "\guac.jpg", B2 
 
-	y := new XML(chipdir "currlist.xml")											; Get latest local currlist into memory
-	arch := new XML(chipdir "archlist.xml")											; Get archive.xml
 	datedir := Object()
 	mo := ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
 }
 
 Gosub MainGUI																		; Draw the main GUI
 if (firstRun) {
-	;~ SoundPlay, % chipDir "chillin.wav", Wait
 	SplashImage, off
 	firstRun := false
 }
@@ -60,11 +60,7 @@ ExitApp
 MainGUI:
 {
 	if !IsObject(dt) {
-		if (isDevt) {
-			dt := GetConfDate("20220614")											; use test dir. change this if want "live" handling
-		} else {
-			dt := GetConfDate()														; determine next conference date into array dt
-		}
+		dt := GetConfDate(confDT)													; determine next conference date into array dt													; 
 	}
 	Gui, main:Default
 	Gui, Destroy
@@ -151,12 +147,23 @@ GetConfDate(dt:="") {
 		dt += (3-Wday), days
 	}
 	conf := breakdate(dt)
-	return {YYYY:conf.YYYY, MM:conf.MM, MMM:conf.MMM, DD:conf.DD}
+	return {YYYY:conf.YYYY, YY:conf.YY, MM:conf.MM, MMM:conf.MMM, DD:conf.DD}
 }
 
 GetConfDir:
 {
 	confDir := NetConfDir(dt.YYYY,dt.mmm,dt.dd)								; get path to conference folder based on predicted date "dt"
+	if !FileExist(netdir "\" confDir) {
+		SplashImage, Off
+		MsgBox 0x24, Guac files, % "Create conference folder for`n" dt.MM "/" dt.DD "/" dt.YYYY "?"
+		IfMsgBox Yes, {
+			FileCreateDir, % netdir "\" dt.YYYY "\" dt.MM " " dt.MMM "\" dt.MM "." dt.DD "." dt.YY
+			confDir := NetConfDir(dt.YYYY,dt.mmm,dt.dd)
+		} Else {
+			Return
+		}
+	}
+
 	SetWorkingDir % netdir "\" confDir
 	if !IsObject(confList) {												; make sure confList array exists
 		confList := {}
@@ -369,7 +376,6 @@ PatDir:
 	fileNmax =														; clear max filename length
 	filelist =														; clear out filelist
 	filenum =														; clear total valid files
-	pt = 															; clear patient text from Chipotle
 	
 	Loop, Files, % filepath "\*" , F													; read only files in patDir filepath
 	{
@@ -399,31 +405,14 @@ PatDir:
 	Gui, Font, s16
 	Gui, Add, ListBox, % "r" filenum " section w" patLBw " vPatFile gPatFileGet", % filelist
 	Gui, Font, s12
-	Gui, Add, Button, wP Disabled vplMRNbut, No MRN found								; default MRN button to Disabled
+	Gui, Add, Button, wP Disabled vplMRNbut, % patMRN
 	Gui, Add, Button, wP gPatFileGet , Open all files...
 	Gui, Font, s8
-	if (patMRN) {																		; MRN found in gXML
-		pt := checkChip(patMRN)															; check Chipotle currlist (#1) and archlist (#2) for MRN, returns in obj pt
-		GuiControl, , plMRNbut, % patMRN												; change plMRNbut button to MRN
-	}
-	if IsObject(pt) {																	; pt obj has values if exists in either currlist or archlist
-		GuiControl, , plMRNbut, CHIPOTLE data											; change plMRNbut button to indicate Chipotle data present
-		Gui, Add, Text, ys x+m r20 w300 wrap vplChipNote, % ""
-			. "CHIPOTLE data (from " niceDate(pt.dxEd) ")`n" 							; generate CHIPOTLE data string for sidebar
-			. ((pt.dxCard)  ? "Diagnoses:`n" pt.dxCard "`n`n" : "")
-			. ((pt.dxSurg)  ? "Surgeries/Caths:`n" pt.dxSurg "`n`n" : "")
-			. ((pt.dxEP)    ? "EP issues:`n" pt.dxEP "`n`n" : "")
-			. ((pt.dxProb)  ? "Problems:`n" pt.dxProb "`n`n" : "")
-			. ((pt.dxNotes) ? "Notes:`n" pt.dxNotes : "")
-	}
 	Gui, Show, w800 AutoSize, % "[Guac] Patient: " PatName
 	
 	Gosub PatConsole																	; launch PatConsole for patient clock, "Close All", "Open file", etc.
 	SetTimer, PatCxTimer, 500															; start clock for PatCxTimer
 
-	if IsObject(pt) {																	; pt obj had values, added CHIPOTLE data sidebar
-		return																			; finish
-	}
 	if (patMRN) {																		; still have MRN but done
 		return																			; finish
 	}
@@ -578,20 +567,6 @@ parsePatDoc(doc) {
 	return fieldvals(txt)																; return obj with doc sections from fieldvals
 }
 
-checkChip(mrn) {
-/*	Checks currlist and archlist for MRN
-	if exists, parses mrn and returns ptParse array
-*/
-	global y, arch
-	if IsObject(y.selectSingleNode("//id[@mrn='" mrn "']")) {							; present in currlist?
-		return ptParse(mrn,y)
-	} else if IsObject(arch.selectSingleNode("//id[@mrn='" mrn "']")) {					; check the archives
-		return ptParse(mrn,arch)
-	} 
-	
-	return Error
-}
-
 breakDate(x) {
 ; Disassembles 201502150831 into Yr=2015 Mo=02 Da=15 Hr=08 Min=31 Sec=00
 	D_Yr := substr(x,1,4)
@@ -600,9 +575,10 @@ breakDate(x) {
 	D_Hr := substr(x,9,2)
 	D_Min := substr(x,11,2)
 	D_Sec := substr(x,13,2)
+	D_YY := substr(D_Yr,-1,2)
 	FormatTime, D_day, %x%, ddd
 	FormatTime, D_Mon, %x%, MMM
-	return {"YYYY":D_Yr, "MM":D_Mo, "MMM":D_Mon, "DD":D_Da, "ddd":D_day
+	return {"YYYY":D_Yr, "YY":D_YY, "MM":D_Mo, "MMM":D_Mon, "DD":D_Da, "ddd":D_day
 		, "HH":D_Hr, "min":D_Min, "sec":D_sec}
 }
 niceDate(x) {
@@ -707,48 +683,6 @@ cleanspace(ByRef txt) {
 	}
 	return txt
 }
-
-PtParse(mrn,ByRef y) {
-	mrnstring := "/root/id[@mrn='" mrn "']"
-	pl := y.selectSingleNode(mrnstring)
-	return {"NameL":pl.selectSingleNode("demog/name_last").text
-		, "NameF":pl.selectSingleNode("demog/name_first").text
-		, "Sex":pl.selectSingleNode("demog/data/sex").text
-		, "DOB":pl.selectSingleNode("demog/data/dob").text
-		, "Age":pl.selectSingleNode("demog/data/age").text
-		, "Svc":pl.selectSingleNode("demog/data/service").text
-		, "Unit":pl.selectSingleNode("demog/data/unit").text
-		, "Room":pl.selectSingleNode("demog/data/room").text
-		, "Admit":pl.selectSingleNode("demog/data/admit").text
-		, "Attg":pl.selectSingleNode("demog/data/attg").text
-		, "dxEd":y.getAtt(mrnstring "/diagnoses", "ed")
-		, "dxCard":pl.selectSingleNode("diagnoses/card").text
-		, "dxEP":pl.selectSingleNode("diagnoses/ep").text
-		, "dxSurg":pl.selectSingleNode("diagnoses/surg").text
-		, "dxNotes":pl.selectSingleNode("diagnoses/notes").text
-		, "dxProb":pl.selectSingleNode("diagnoses/prob").text
-		, "misc":pl.selectSingleNode("diagnoses/misc").text
-		, "statCons":(pl.selectSingleNode("status").getAttribute("cons") == "on")
-		, "statRes":(pl.selectSingleNode("status").getAttribute("res") == "on")
-		, "statScamp":(pl.selectSingleNode("status").getAttribute("scamp") == "on")
-		, "callN":pl.selectSingleNode("plan/call").getAttribute("next")
-		, "callL":pl.selectSingleNode("plan/call").getAttribute("last")
-		, "callBy":pl.selectSingleNode("plan/call").getAttribute("by")
-		, "CORES":pl.selectSingleNode("info/hx").text
-		, "info":pl.selectSingleNode("info")
-		, "MAR":pl.selectSingleNode("MAR")
-		, "daily":pl.selectSingleNode("notes/daily")
-		, "ccSys":pl.selectSingleNode("ccSys")
-		, "ProvCard":y.getAtt(mrnstring "/prov","provCard")
-		, "ProvSchCard":y.getAtt(mrnstring "/prov","SchCard")
-		, "ProvCSR":y.getAtt(mrnstring "/prov","CSR")
-		, "ProvEP":y.getAtt(mrnstring "/prov","provEP")
-		, "ProvPCP":y.getAtt(mrnstring "/prov","provPCP")
-		, "statPM":(pl.selectSingleNode("prov").getAttribute("pm") == "on")
-		, "statMil":(pl.selectSingleNode("prov").getAttribute("mil") == "on")
-		, "statTxp":(pl.selectSingleNode("prov").getAttribute("txp") == "on")}
-}
-
 
 #Include xml.ahk
 #Include StrX.ahk
