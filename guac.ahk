@@ -313,7 +313,7 @@ ReadXls:
 				headerRow := RowNum
 			}
 			if (rownum=headerRow) {														; Row 2 is headers
-				; Patient name / MRN / Cardiologist / Diagnosis / conference prep / scheduling notes / presented / deferred / imaging needed / ICU LOS / Total LOS / Surgeons / time
+				; Patient name / MRN / Cardiologist / Diagnosis / Proposed Intervention / Conference Prep / Scheduling notes / Timing / Deferred / Preop Imaging / Surgeons/Case length / Conference prep notes
 				if instr(cel,"Patient name") {											; Fix some header names
 					cel:="Name"
 					nameCol := ColNum
@@ -324,7 +324,7 @@ ReadXls:
 				if instr(cel,"scheduling notes") {
 					cel:="Notes"
 				}
-				if instr(cel,"imaging needed") {
+				if RegExMatch(cel,"i)echo|imaging") {
 					cel:="Imaging"
 				}
 				xls_hdr[ColNum] := trim(cel)											; Add cel to headers xls_hdr[]
