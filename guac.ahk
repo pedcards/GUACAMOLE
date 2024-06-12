@@ -22,7 +22,7 @@ Initialization:
 	{
 		isDevt := true
 		netdir := A_WorkingDir "\devfiles\Tuesday_Conference"						; local files
-		confDT := "20220614140000"
+		confDT := "20240514140000"
 		tmp := CMsgBox("Development","Choose date"
 			, confDT "|TODAY")
 		if (tmp="TODAY") {
