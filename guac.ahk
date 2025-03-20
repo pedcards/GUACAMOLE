@@ -239,6 +239,7 @@ GetConfDir:
 	LV_ModifyCol(3,"AutoHdr Center")
 	LV_ModifyCol(4,"AutoHdr")
 	LV_ModifyCol(5,"AutoHdr")
+	LV_ModifyCol(6,"Sort")
 	Return
 }
 
