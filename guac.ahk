@@ -349,6 +349,7 @@ ReadXls:
 			gXml.addElement("id","root",{name:xls_nameUP})
 		}
 		gXml.setAtt(xls_id,{mrn:xls_mrn})
+		gXml.setAtt(xls_id,{order:xls_cel[ObjHasValue(xls_hdr,"order")]})
 		if !IsObject(gXml.selectSingleNode(xls_id "/name_full")) {						; Add full name if not present
 			gXml.addElement("name_full",xls_id,xls_name)
 		}
