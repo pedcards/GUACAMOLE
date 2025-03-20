@@ -1,6 +1,7 @@
 /* 	GUACAMOLE conference data browser (C)2015-2023 TC
 */
 
+#Requires AutoHotkey v1.1
 #NoEnv  ; Recommended for performance and compatibility with future AutoHotkey releases.
 Clipboard = 	; Empty the clipboard
 SendMode Input ; Recommended for new scripts due to its superior speed and reliability.
@@ -221,12 +222,14 @@ GetConfDir:
 			keyDone := gXml.getAtt(keyElement,"done")						; DONE flag
 			keyDur := (tmp:=gXml.getAtt(keyElement,"dur")) ? formatSec(tmp) : ""	; If dur exists, get it
 			keyNote := (tmp:=gXml.selectSingleNode(keyElement "/notes").text) ? tmp : ""	; NOTE, if present
+			keyOrder := gXml.getAtt(keyElement,"order")
 			LV_Add(""
 				,keyNm														; UPPER CASE name
 				,(keyDone) ? "x" : ""										; DONE or not
 				,(keyDur) ? keyDur.MM ":" keyDur.SS : ""					; total DUR spent on this patient MM:SS
 				,(keyDx) ? keyDx : ""										; Diagnosis
-				,(keyNote) ? keyNote : "")									; note for this patient
+				,(keyNote) ? keyNote : ""									; note for this patient
+				,(keyOrder) ? keyOrder : "1000")							; list order
 		}
 	}
 	Progress, Off
