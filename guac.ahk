@@ -239,7 +239,7 @@ GetConfDir:
 	LV_ModifyCol(3,"AutoHdr Center")
 	LV_ModifyCol(4,"AutoHdr")
 	LV_ModifyCol(5,"AutoHdr")
-	LV_ModifyCol(6,"Sort")
+	LV_ModifyCol(6,"10 Sort Logical")
 	Return
 }
 
@@ -313,7 +313,7 @@ ReadXls:
 				staffRow := RowNum
 				break
 			}
-			if (cel ~= "i)Patient name|MRN|Cardiologist") {
+			if (cel ~= "i)Patient name|MRN|Cardiologist|Order") {
 				headerRow := RowNum
 			}
 			if (rownum=headerRow) {														; Row 2 is headers
