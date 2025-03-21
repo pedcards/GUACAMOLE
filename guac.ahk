@@ -388,7 +388,7 @@ PatDir:
 	gXml := new XML("guac.xml")										; refresh gXml from guac.xml
 
 	Gui, Main:Submit, NoHide										; use Submit to update variables
-	PatName := confList[A_EventInfo]								; get PatName from confList pointer from A_EventInfo; could we just get the first column?
+	LV_GetText(PatName,LV_GetNext(),1)													; get PatName from first column in LV?
 	PatTime := A_Now												; timer start
 	PatTime += -gXml.getAtt("/root/id[@name='" patName "']","dur"), Seconds		; add to previous cumulative dur time from gXml
 	filepath := netdir "\" confdir "\" RegExReplace(PatName,"_","'")						; PatName is name of folder
