@@ -67,10 +67,10 @@ MainGUI:
 	Gui, Destroy
 	Gui, Font, s16 wBold
 	Gui, Add, Text, y0 x20 vCTime, % "              "								; Conference real time
-	Gui, Add, Text, y0 x460 vCDur, % "              "								; Conference duration (only exists for Presenter)
-	Gui, Add, Text, y0 x160 w240 h20 +Center, .-= GUACAMOLE =-.
+	Gui, Add, Text, y0 x650 vCDur, % "              "								; Conference duration (only exists for Presenter)
+	Gui, Add, Text, y0 x265 w240 h20 +Center, .-= GUACAMOLE =-.
 	Gui, Font, wNorm s8 wItalic
-	Gui, Add, Text, yp+30 xp wp +Center, General Use Access tool for Conference Archive
+	Gui, Add, Text, yp+30 xp wp +Center, General Use Access to Conference Archive
 	Gui, Add, Text, yp+14 xp wp +Center, Merged OnLine Elements
 	Gui, Font, wBold
 	Gui, Font, wNorm
@@ -211,7 +211,7 @@ GetConfDir:
 	gXml.save("guac.xml")													; Write Guac XML
 	
 	Gui, Font, s16
-	Gui, Add, ListView, % "r" confList.length() " x20 w720 Hdr AltSubmit Grid BackgroundSilver NoSortHdr NoSort gPatDir", Name|Done|Takt|Diagnosis|Note
+	Gui, Add, ListView, % "r" confList.length()+1 " x20 w720 Hdr AltSubmit Grid BackgroundSilver NoSortHdr gPatDir", Name|Done|Takt|Diagnosis|Note|Order
 	Progress, % (firstRun)?"off":"",,Rendering conference list
 	for key,val in confList
 	{
