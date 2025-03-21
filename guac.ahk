@@ -380,22 +380,22 @@ ReadXls:
 
 PatDir:
 {
-	if !(A_GuiEvent = "DoubleClick")								; Only respond to double-click in GetConfDir listview
+	if !(A_GuiEvent = "DoubleClick")													; Only respond to double-click in GetConfDir listview
 		return
-	if WinExist("[Guac] Patient:") {								; if another PatL window still open, close it and all associated windows
+	if WinExist("[Guac] Patient:") {													; if another PatL window still open, close it and all associated windows
 		Gosub PatLGuiClose
 	}
-	gXml := new XML("guac.xml")										; refresh gXml from guac.xml
+	gXml := new XML("guac.xml")															; refresh gXml from guac.xml
 
-	Gui, Main:Submit, NoHide										; use Submit to update variables
+	Gui, Main:Submit, NoHide															; use Submit to update variables
 	LV_GetText(PatName,LV_GetNext(),1)													; get PatName from first column in LV?
-	PatTime := A_Now												; timer start
-	PatTime += -gXml.getAtt("/root/id[@name='" patName "']","dur"), Seconds		; add to previous cumulative dur time from gXml
-	filepath := netdir "\" confdir "\" RegExReplace(PatName,"_","'")						; PatName is name of folder
-	filePmax = 														; clear max file field length
-	fileNmax =														; clear max filename length
-	filelist =														; clear out filelist
-	filenum =														; clear total valid files
+	PatTime := A_Now																	; timer start
+	PatTime += -gXml.getAtt("/root/id[@name='" patName "']","dur"), Seconds				; add to previous cumulative dur time from gXml
+	filepath := netdir "\" confdir "\" RegExReplace(PatName,"_","'")					; PatName is name of folder
+	filePmax = 																			; clear max file field length
+	fileNmax =																			; clear max filename length
+	filelist =																			; clear out filelist
+	filenum =																			; clear total valid files
 	
 	Loop, Files, % filepath "\*" , F													; read only files in patDir filepath
 	{
