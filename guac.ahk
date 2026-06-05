@@ -287,18 +287,18 @@ ReadXls:
 	staffRow := 0
 	headerRow := 0
 	nameCol := 0
-	maxcol := 1
+	maxcol := xls_visible.Columns.Count
 
-	Loop 
+	for row in xls_visible.Rows															; iterate through visible rows
 	{
-		RowNum := A_Index																; Loop through rows in RowNum
-		Loop
-		{	
-			ColNum := A_Index															; Iterate through columns
-			cel := oWorkbook.Sheets(1).Range(colArr[ColNum] RowNum).value				; Get value of colNum rowNum (e.g. C4)
-			if (colnum>maxcol) {														; Extend maxcol (largest col) when we have passed the old max
-				if (cel="") {
-					break
+		RowNum := A_Index
+		
+		for col in row.Cells															; iterate through columns
+		{
+			ColNum := A_Index
+			cel := col.value															; Get value of cell
+
+			if !(staffRow) && (cel ~= "i)Next Conf Date|\d{1,2}.\d{1,2}.\d{2,4}|Echo|PCC Fellow") {
 				}
 				maxcol:=colnum
 			}
