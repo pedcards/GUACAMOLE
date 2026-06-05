@@ -185,19 +185,11 @@ GetConfDir:
 	{
 		tmpNm := A_LoopFileName
 		tmpExt := A_LoopFileExt
-		if (tmpNm ~= "i)Fast.?Track|-FT|\sFT|\sPrep\.")								; exclude Fast Track files and folders
-			continue
-		if (tmpExt) {														; evaluate files with extensions
-			if (tmpNm ~= "i)(\~\$|(Fast.?Track|-FT|\sFT|\sPrep\.))")					; exclude temp and "Fast Track" files
-				continue
-			if (tmpNm ~= "i)(PCC)?.*\d{1,2}\.\d{1,2}\.\d{2,4}.*xls") {		; find XLS that matches PCC 3.29.16.xlsx
-				confXls := tmpNm
-			}
-			continue
-		}
+		if (tmpNm ~= "i)Fast.?Track|-FT|\sFT|\sPrep\.|\.xls|\.xml")			; exclude Fast Track files and folders
+			continue														; and any XLS or XML files
 		tmpNm := RegExReplace(tmpNm,"\'","_")
 		if !IsObject(confList[tmpNm]) {										; confList is empty
-			tmpNmUP := RegExReplace(format("{:U}",tmpNm),"\'","_")									; place filename in all UPPER CASE
+			tmpNmUP := RegExReplace(format("{:U}",tmpNm),"\'","_")			; place filename in all UPPER CASE
 			confList.Push(tmpNmUP)											; add it to end of confList
 			confList[tmpNmUP] := {name:tmpNm,done:0,note:""}				; name=actual filename, done=no, note=cleared
 		}
