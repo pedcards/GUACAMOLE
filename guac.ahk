@@ -280,6 +280,8 @@ ReadXls:
 	FileCopy % confXls, guac.xlsx, 1								; Create a copy of the active XLS file 
 	oWorkbook := ComObjGet(netDir "\" confDir "\guac.xlsx")			; Open the copy in memory (this is a one-way street)
 	colArr := ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q"] ;array of column letters
+	xls_sheet := oWorkbook.Sheets("New Draft")
+	xls_visible := xls_sheet.UsedRange.SpecialCells(12)									; SpecialCells(12) = visible cells
 	xls_hdr := Object()
 	xls_cel := Object()
 	staffRow := 0
