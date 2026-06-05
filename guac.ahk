@@ -42,6 +42,7 @@ Initialization:
 
 	firstRun := true
 	SplashImage, % netdir "\guac.jpg", B2 
+	confXls := netdir "\PCC Agenda.xlsx"
 
 	datedir := Object()
 	mo := ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
