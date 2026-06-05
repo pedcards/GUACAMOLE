@@ -299,28 +299,22 @@ ReadXls:
 			cel := col.value															; Get value of cell
 
 			if !(staffRow) && (cel ~= "i)Next Conf Date|\d{1,2}.\d{1,2}.\d{2,4}|Echo|PCC Fellow") {
-				}
-				maxcol:=colnum
-			}
-			; if ((cel="") && (colnum=maxcol))											; Find max column
-			; 	break
-			if !(staffRow) && (cel ~= "i)\d{1,2}.\d{1,2}.\d{2,4}|Echo|PCC Fellow") {
 				staffRow := RowNum
 				break
 			}
-			if (cel ~= "i)Patient name|MRN|Cardiologist|Order") {
+			if (cel ~= "i)Pt Type|Pt Name|MRN|Cardiologist|Order") {
 				headerRow := RowNum
 			}
 			if (rownum=headerRow) {														; Row 2 is headers
 				; Patient name / MRN / Cardiologist / Diagnosis / Proposed Intervention / Conference Prep / Scheduling notes / Timing / Deferred / Preop Imaging / Surgeons/Case length / Conference prep notes
-				if instr(cel,"Patient name") {											; Fix some header names
+				if instr(cel,"Pt name") {												; Fix some header names
 					cel:="Name"
 					nameCol := ColNum
 				}
-				if instr(cel,"Conference prep") {
+				if instr(cel,"Conf Prep Notes") {
 					cel:="Prep"
 				}
-				if instr(cel,"scheduling notes") {
+				if instr(cel,"Scheduling Notes") {
 					cel:="Notes"
 				}
 				if RegExMatch(cel,"i)echo|imaging") {
@@ -334,11 +328,7 @@ ReadXls:
 		xls_mrn := Round(xls_cel[ObjHasValue(xls_hdr,"MRN")])							; Get value in xls_hdr MRN column 
 		xls_name := xls_cel[ObjHasValue(xls_hdr,"Name")]								; Get name from xls_hdr Name column
 		if !(xls_mrn) {																	; Empty MRN, move on
-			if (headerRow) && (RowNum>headerRow) {										; No MRN past headerrow means last row
-				break
-			} else {
-				Continue
-			}
+			Continue
 		}
 		xls_nameL := RegExReplace(strX(xls_name,"",1,1,",",1,1),"\'","_")
 		StringUpper, xls_nameUP, xls_nameL												; Name in upper case
