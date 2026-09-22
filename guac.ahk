@@ -217,7 +217,7 @@ GetConfDir:
 			keyNote := (tmp:=gXml.selectSingleNode(keyElement "/notes").text) ? tmp : ""	; NOTE, if present
 			keyOrder := gXml.getAtt(keyElement,"order")
 			LV_Add(""
-				,keyNm														; UPPER CASE name
+				,RegExReplace(keyNm,"^(FT|IP|OP)\s+\-\s+")						; UPPER CASE name
 				,(keyDone) ? "x" : ""										; DONE or not
 				,(keyDur) ? keyDur.MM ":" keyDur.SS : ""					; total DUR spent on this patient MM:SS
 				,(keyDx) ? keyDx : ""										; Diagnosis
