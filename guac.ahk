@@ -184,7 +184,7 @@ GetConfDir:
 	{
 		tmpNm := A_LoopFileName
 		tmpExt := A_LoopFileExt
-		if (tmpNm ~= "i)FT - |Fast.?Track|-FT|\sFT|\sPrep\.")					; exclude Fast Track files and folders
+		if (tmpNm ~= "i)FT - |Fast.?Track|-FT|\sFT|\sPrep\.")				; exclude Fast Track files and folders
 			continue
 		if (tmpExt) {														; evaluate files with extensions
 			if (tmpNm ~= "i)(\~\$|(FT - |Fast.?Track|-FT|\sFT|\sPrep\.))")	; exclude temp and "Fast Track" files
@@ -194,12 +194,13 @@ GetConfDir:
 			}
 			continue
 		}
+		fNam := tmpNm
 		tmpNm := RegExReplace(tmpNm,"\'","_")
 		tmpNm := RegExReplace(tmpNm,"(FT|IP|OP) - ")
 		if !IsObject(confList[tmpNm]) {										; confList is empty
-			tmpNmUP := RegExReplace(format("{:U}",tmpNm),"\'","_")									; place filename in all UPPER CASE
+			tmpNmUP := RegExReplace(format("{:U}",tmpNm),"\'","_")			; place filename in all UPPER CASE
 			confList.Push(tmpNmUP)											; add it to end of confList
-			confList[tmpNmUP] := {name:tmpNm,done:0,note:""}				; name=actual filename, done=no, note=cleared
+			confList[tmpNmUP] := {fname:fNam,name:tmpNm,done:0,note:""}		; name=actual filename, done=no, note=cleared
 		}
 		if !IsObject(gXml.selectSingleNode("/root/id[@name='" tmpNmUP "']")) {
 			gXml.addElement("id","root",{name: tmpNmUP})					; Add to Guac XML if not present
@@ -390,9 +391,10 @@ PatDir:
 
 	Gui, Main:Submit, NoHide															; use Submit to update variables
 	LV_GetText(PatName,LV_GetNext(),1)													; get PatName from first column in LV?
+	PatFolder := confList[PatName].fName
 	PatTime := A_Now																	; timer start
 	PatTime += -gXml.getAtt("/root/id[@name='" patName "']","dur"), Seconds				; add to previous cumulative dur time from gXml
-	filepath := netdir "\" confdir "\" RegExReplace(PatName,"_","'")					; PatName is name of folder
+	filepath := netdir "\" confdir "\" RegExReplace(PatFolder,"_","'")					; PatName is name of folder
 	filePmax = 																			; clear max file field length
 	fileNmax =																			; clear max filename length
 	filelist =																			; clear out filelist
