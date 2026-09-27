@@ -195,6 +195,7 @@ GetConfDir:
 			continue
 		}
 		tmpNm := RegExReplace(tmpNm,"\'","_")
+		tmpNm := RegExReplace(tmpNm,"(FT|IP|OP) - ")
 		if !IsObject(confList[tmpNm]) {										; confList is empty
 			tmpNmUP := RegExReplace(format("{:U}",tmpNm),"\'","_")									; place filename in all UPPER CASE
 			confList.Push(tmpNmUP)											; add it to end of confList
@@ -224,12 +225,12 @@ GetConfDir:
 			keyNote := (tmp:=gXml.selectSingleNode(keyElement "/notes").text) ? tmp : ""	; NOTE, if present
 			keyOrder := gXml.getAtt(keyElement,"order")
 			LV_Add(""
-				,RegExReplace(keyNm,"^(FT|IP|OP)\s+\-\s+")						; UPPER CASE name
+				,keyNm														; UPPER CASE name
 				,(keyDone) ? "x" : ""										; DONE or not
 				,(keyDur) ? keyDur.MM ":" keyDur.SS : ""					; total DUR spent on this patient MM:SS
 				,(keyDx) ? keyDx : ""										; Diagnosis
 				,(keyNote) ? keyNote : ""									; note for this patient
-				,(keyOrder) ? keyOrder : "1000")							; list order
+				,(keyOrder) ? keyOrder : "1000" )							; list order
 		}
 	}
 	Progress, Off
