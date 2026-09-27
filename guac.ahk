@@ -185,13 +185,23 @@ GetConfDir:
 	{
 		tmpNm := A_LoopFileName
 		tmpExt := A_LoopFileExt
-		if (tmpNm ~= "i)Fast.?Track|-FT|\sFT|\sPrep\.|\.xls|\.xml")			; exclude Fast Track files and folders
-			continue														; and any XLS or XML files
+		if (tmpNm ~= "i)FT - |Fast.?Track|-FT|\sFT|\sPrep\.")				; exclude Fast Track files and folders
+			continue
+		if (tmpExt) {														; evaluate files with extensions
+			if (tmpNm ~= "i)(\~\$|(FT - |Fast.?Track|-FT|\sFT|\sPrep\.))")	; exclude temp and "Fast Track" files
+				continue
+			if (tmpNm ~= "i)(PCC)?.*\d{1,2}\.\d{1,2}\.\d{2,4}.*xls") {		; find XLS that matches PCC 3.29.16.xlsx
+				confXls := tmpNm
+			}
+			continue
+		}
+		fNam := tmpNm
 		tmpNm := RegExReplace(tmpNm,"\'","_")
+		tmpNm := RegExReplace(tmpNm,"(FT|IP|OP) - ")
 		if !IsObject(confList[tmpNm]) {										; confList is empty
 			tmpNmUP := RegExReplace(format("{:U}",tmpNm),"\'","_")			; place filename in all UPPER CASE
 			confList.Push(tmpNmUP)											; add it to end of confList
-			confList[tmpNmUP] := {name:tmpNm,done:0,note:""}				; name=actual filename, done=no, note=cleared
+			confList[tmpNmUP] := {fname:fNam,name:tmpNm,done:0,note:""}		; name=actual filename, done=no, note=cleared
 		}
 		if !IsObject(gXml.selectSingleNode("/root/id[@name='" tmpNmUP "']")) {
 			gXml.addElement("id","root",{name: tmpNmUP})					; Add to Guac XML if not present
@@ -217,12 +227,12 @@ GetConfDir:
 			keyNote := (tmp:=gXml.selectSingleNode(keyElement "/notes").text) ? tmp : ""	; NOTE, if present
 			keyOrder := gXml.getAtt(keyElement,"order")
 			LV_Add(""
-				,RegExReplace(keyNm,"^(FT|IP|OP)\s+\-\s+")						; UPPER CASE name
+				,keyNm														; UPPER CASE name
 				,(keyDone) ? "x" : ""										; DONE or not
 				,(keyDur) ? keyDur.MM ":" keyDur.SS : ""					; total DUR spent on this patient MM:SS
 				,(keyDx) ? keyDx : ""										; Diagnosis
 				,(keyNote) ? keyNote : ""									; note for this patient
-				,(keyOrder) ? keyOrder : "1000")							; list order
+				,(keyOrder) ? keyOrder : "1000" )							; list order
 		}
 	}
 	Progress, Off
@@ -374,9 +384,10 @@ PatDir:
 
 	Gui, Main:Submit, NoHide															; use Submit to update variables
 	LV_GetText(PatName,LV_GetNext(),1)													; get PatName from first column in LV?
+	PatFolder := confList[PatName].fName
 	PatTime := A_Now																	; timer start
 	PatTime += -gXml.getAtt("/root/id[@name='" patName "']","dur"), Seconds				; add to previous cumulative dur time from gXml
-	filepath := netdir "\" confdir "\" RegExReplace(PatName,"_","'")					; PatName is name of folder
+	filepath := netdir "\" confdir "\" RegExReplace(PatFolder,"_","'")					; PatName is name of folder
 	filePmax = 																			; clear max file field length
 	fileNmax =																			; clear max filename length
 	filelist =																			; clear out filelist
